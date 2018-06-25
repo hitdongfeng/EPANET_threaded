@@ -1,0 +1,112 @@
+Overview
+
+  Multiple CPUs are increasingly used to parallelise tasks that
+  require a high computation time. In fact, parallel optimisation
+  algorithms are widely present in the literature. On the other hand,
+  hydraulic simulators that support parallel computation are
+  scarce. The most popular research simulator, EPANET [1], was not
+  designed with concurrency in mind. We are currently developing a new
+  thread-safe variant of the EPANET Toolkit that can be used in
+  parallel applications based on our own modified version of the
+  EPANET Toolkit [2].
+
+  More information about the development of this thread-safe version
+  of EPANET and its potential applications is available in the
+  following paper:
+
+  * Manuel López-Ibáñez, T. Devi Prasad, and Ben Paechter. Parallel
+    Optimisation Of Pump Schedules With A Thread-Safe Variant Of
+    EPANET Toolkit. In Proceedings of the 10th Annual
+    Water Distribution Systems Analysis Conference WDSA2008. Van
+    Zyl, J.E., Ilemobade, A.A., Jacobs, H.E. (eds.), August 17-20,
+    2008, Kruger National Park, South Africa.
+
+  Please, be aware that this is EXPERIMENTAL software. Not all
+  functionality of the original EPANET Toolkit is available.
+
+
+Download 
+
+  The latest version is available from:
+
+      http://sbe.napier.ac.uk/~manuel/epanet-thread-safe#download
+
+
+License
+
+  This version of EPANET is Copyright (C) 2008 Manuel López-Ibáñez.
+
+  This version of EPANET is free software (software libre); you can
+  redistribute it and/or modify it under the terms of version 2 of
+  the GNU General Public License as published by the Free Software
+  Foundation.
+
+  This version of EPANET is distributed in the hope that it will be
+  useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+  of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  General Public License for more details (LICENSE file or
+  http://www.gnu.org/copyleft/gpl.html ).
+
+  You are not allowed to use or modify this version of EPANET or its
+  source code if you do not agree with the terms of the GNU General
+  Public License. In that case you may prefer to use the original
+  EPANET [1] which is available as public domain software.
+
+  IMPORTANT NOTE: Please be aware that the fact that this program is
+  released as Free Software does not excuse you from scientific
+  propriety, which obligates you to give appropriate credit! If you
+  write a scientific paper describing research that made substantive
+  use of this program, it is your obligation as a scientist to (a)
+  mention the fashion in which this software was used, including the
+  version number, in the Methods section, to allow replication; (b)
+  cite as a reference the paper:
+
+    Manuel López-Ibáñez, T. Devi Prasad, and Ben Paechter. Parallel
+    Optimisation Of Pump Schedules With A Thread-Safe Variant Of
+    EPANET Toolkit. In Proceedings of the 10th Annual Water
+    Distribution Systems Analysis Conference WDSA2008. Van Zyl, J.E.,
+    Ilemobade, A.A., Jacobs, H.E. (eds.), August 17-20, 2008, Kruger
+    National Park, South Africa.
+
+  Moreover, as a personal note, I would appreciate it if you would
+  email m.lopez-ibanez@napier.ac.uk with citations of papers
+  referencing this work so I can mention them to my funding agent and
+  tenure committee.
+
+
+Using the EPANET Toolkit in your program
+
+  Building successfully a program which uses the EPANET library
+  requires that the compiler is able to find the header file
+  toolkit.h and the library file libtoolkit.a . The first step is
+  accomplished by adding the line #include "toolkit.h" to your header
+  file (e.g. yourprogram.h ).  You also need to compile your program
+  using the option -Idir where dir is the directory of
+  toolkit.h. (The option -Idir is not needed if toolkit.h is in the
+  current directory.) You may also need to indicate to GCC that it
+  should link with the mathematical library using the option
+  -lm. For example:
+
+$ gcc -I./toolkithdir/ -o yourprogram yourprogram.c libtoolkit.a -lm
+
+  In old versions of GCC you may need to use the options -L and -l to
+  link with libtoolkit.a . Consult the manual page of GCC for
+  details.
+
+
+Building the EPANET Toolkit from source
+
+  The following command will build the library and place the
+  resulting files libtoolkit.a and toolkit.h in the parent directory:
+
+$ make toolkit
+
+  Please check the file Makefile for more information about building
+  the library.
+
+
+------------------------------------------------------------------------
+[1] http://www.epa.gov/ORD/NRMRL/wswrd/epanet.html
+[2] http://sbe.napier.ac.uk/~manuel/epanetlinux
+[3] m.lopez-ibanez@napier.ac.uk
+    http://sbe.napier.ac.uk/~manuel/index#contact

@@ -1,0 +1,236 @@
+
+ * hydraul.c (pumpswitch): Fix corner case where we will count one
+   less switch than the real number.
+
+1.6
+
+ * epanet.c (ENaddleveltrigger): In case that start_time > stop_time,
+   it adds one rule for the interval [start_time, SECperDAY - 1] and
+   another for [0, stop_time]. In case that start_time == stop_time,
+   don't do anything.
+
+ * rules.c (addlevelbasedtrigger): Return error 202 if start_time >=
+   stop_time.
+
+1.5
+
+ * toolkit.h: New #define EPANET_VERSION
+
+ * Makefile: make tags. Update version correctly in toolkit.h.
+
+ * epanet.c (ENgetcontrol): Fix segmentation fault when *nindex > Nnodes.
+   (merge -r 81:82 svn://localhost/toolkit/branches/v1.4)
+
+1.4
+
+ * New README file
+
+ * Several optimisations when using GNU GCC >= 3. Also, added a
+   Makefile option to compile for a particular architecture For
+   example, for a Intel Pentium 4 architecture you would use the
+   command `make march=pentium4'. Check GCC documentation for the names
+   of the architectures supported by your version of GCC.
+
+   - pipecoeff marked as static inline
+
+   - help arrays in linsolve() moved from vars.h to smatrix.c
+     added MARCH parameter to Makefile.
+
+   - -fmerge-constants: Attempt to merge identical constants (string
+                        constants and floating point constants) across
+                        compilation units.
+
+   - save one division in pipecoeff()
+
+   - remove unneccessary variables and operations in linsolve(). For
+     example, calloc() should set memory to zero, and thus, memset()
+     is redundant.
+
+   - replace ABS() by fabs(): (1) fabs() is faster, however, not all
+     ABS() calls can be replaced because of implicit casting between
+     float and double resulting on rounding errors.
+
+   Computation time is reduced in 13.7% on average when compiling with
+   GCC 3.2.2 and running on an Intel Pentium 4 CPU 2.66GHz (cache
+   size: 512 KB).
+
+ * Section [COORDINATES] of input file is now parsed by ENopen()
+
+ * ENgetnumwarnings(void) returns number of warnings generated and not
+   only those caused by negative pressures.
+
+ * New parameter code:
+
+   - EN_JUNCS of ENgetcount() return the number of junctions in the
+     network.
+
+ * The following constant values are defined in toolkit.h :
+
+    EN_MAX_ID_LEN         : Max. # characters in ID name
+    EN_MAX_MSG_LEN        : Max. # characters in message text
+    EN_MAX_FILENAME_LEN   : Max. # characters in file name
+
+ * New toolkit functions:
+
+   - ENgettotalleakage() gives total volume of water leaked by
+     emitters.
+
+   - ENgetnode_xcoord() gives x coordinate of a node.
+
+   - ENgetnode_ycoord() gives y coordinate of a node.
+
+
+1.3
+
+ * Compiling with optimisation level 3 (-O3) reduces execution time in
+   approximately 35%. However, optimisation affects to floating-point
+   errors producing slightly different results. Therefore,
+   optimisation is turned off by default. In order to turn it on,
+   build the library using "make all OPTIMISE=-O3".
+
+ * Fixed warnings when used code optimisation level 3 (-O3)
+       hydraul.c: In function `netsolve':
+       hydraul.c:1175: warning: `errcode' might be used uninitialized in this function
+
+       inpfile.c: In function `saveinpfile':
+       inpfile.c:151: warning: `ftmp' might be used uninitialized in this function
+
+       input1.c: In function `inittanks':
+       input1.c:352: warning: `n' might be used uninitialized in this function
+
+       input2.c: In function `getpumpparams':
+       input2.c:348: warning: `h2' may be used uninitialized in this function
+       input2.c:348: warning: `q2' may be used uninitialized in this function
+       input2.c:348: warning: `h0' may be used uninitialized in this function
+       input2.c:348: warning: `h1' may be used uninitialized in this function
+       input2.c:348: warning: `q1' may be used uninitialized in this function
+       input2.c:347: warning: `n' may be used uninitialized in this function
+       input2.c:347: warning: `j' may be used uninitialized in this function
+
+       quality.c: In function `sourceinput':
+       quality.c:812: warning: `massadded' may be used uninitialized in this function
+
+
+1.2
+
+ * Fixed from EPANET 2.00.10: missing parameter code EN_SOURCEPAT in
+   ENgetnodevalue() caused error 251.
+
+ * When ENgetcount(EN_CONTROLCOUNT, &count), a control may be added
+   dynamically calling ENsetcontrol() with cindex = count + 1
+
+ * Saves time of day (in seconds) when a pump changes its status in a
+   pump schedule vector. No more than 24 events will be
+   recorded in the vector of pump schedule and events occurred after 24
+   hours won't be recorded.
+
+ * Calculation of pump switches and update of the pump schedule vector
+   is performed by pumpswitch(), which must be called from every point
+   where the status of a pump is changed.
+
+ * New parameter codes:
+
+   - EN_UPATTERN of ENsetlinkvalue() allows to assign an utilization
+     pattern to a pump.
+
+   - EN_SCHEDULE of ENgetlinkvalue() returns pump schedule vector.
+
+   - EN_PUMPCOUNT and EN_RESERVCOUNT of ENgetcount() return the number
+     of pumps and the number of reservoirs in the network.
+
+   - EN_INITVOL and EN_VOLUME of ENgetnodevalue() return initial and
+     current volume of a tank.
+
+   - EN_CLOCKSTART of ENgettimeparam() returns time of the day at
+     which simulation begins (seconds).
+
+   - EN_MAXLEVEL and EN_MINLEVEL of getnodevalue() return maximum and
+     minimum levels of a tank.
+
+ * New toolkit functions:
+
+   - ENgettankindex() and ENgetpumpindex() allow to find a pump
+     or tank without knowing its id or index.
+
+   - ENgetpumpswitches() number of switches of a pump.
+
+   - ENgettotalenergycost() calculates total energy cost per pump
+     plus demand cost.
+
+   - ENaddpattern() adds a new pattern to the database.
+
+   - ENaddleveltrigger() adds rule with following format
+
+           IF SYSTEM CLOCKTIME >= start_time (in seconds)
+           AND SYSTEM CLOCKTIME <  stop_time  (in seconds)
+           AND TANK id(tank_index) LEVEL [BELOW|ABOVE] level
+           THEN PUMP id(pump_index) STATUS IS status
+
+   - ENgetminstoptime() returns the shortest time interval (in
+     seconds) that a certain pump was not active.
+
+   - ENrulesclear(void) removes all rules.
+
+   - ENgetnumwarnings(void) returns number of warnings caused by
+     negative pressures.
+
+ * Fixed: complex rules are checked since the start of the
+   simulation.  (NOTE: this feature may break compatibility with
+   EPANET2 [L. Rossman] version 2.00.10, where the complex rules
+   are not enforced until the first time step (1/10 of time
+   interval) and, therefore, the results are slightly different if
+   the initial conditions are not consistent with the rules)
+
+ * Fixed: does not return error if the name of the report file and
+   the name of the binary output file both are the empty string "".
+
+ * Fixed from EPANET 2.00.10:
+
+   Setting lindex to 0 using ENsetcontrol() should remove the
+   control. However, controltimestep() does not check that lindex is
+   equal to 0 before using other parameters, and thus, it does not
+   ignore this control. The result is a wrong time step or a
+   segmentation fault depending whether the parameters were valid or
+   uninitialized values. This bug fix may break backward compatibility
+   for programs which remove controls by setting lindex to 0 using
+   ENsetcontrol() since a wrong time step may affect the results
+   without the program reporting any error or crashing.
+
+
+1.1
+
+ * All files converted to Unix EOL format
+
+ * Deleted trailing white spaces
+
+ * Indentation Style is Emac's K&R
+
+
+1.0
+
+ * Compiles with gcc version 4.0.2 20050808 (Ubuntu 4.0.1-4ubuntu9)
+
+ * Added #define LINUX. Comment it out to compile on Windows.
+
+ * Added Makefile, LICENSE and Changelog files.
+
+ * This modified version of EPANET2 is licensed under the
+   GNU General Public License (GPL), available at
+   <http://www.gnu.org/licenses/gpl.html > and in LICENSE file
+
+ * Fixed: report.c:700: warning: int format, long int arg (arg 3)
+
+      in text.h
+      - #define FMT82  "\n\f\n  Page %-d    %60.60s\n"
+      + #define FMT82  "\n\f\n  Page %-ld    %60.60s\n"
+
+ * Fixed:
+      input2.c: In function `readdata':
+      input2.c:191: warning: too few arguments for format
+
+      -            sprintf(Msg,ERR214);
+      +            sprintf(Msg,ERR214, line);
+
+ * Fixed: added cast to "int" because several warnings as:
+
+      report.c:761: warning: array subscript has type `char'
